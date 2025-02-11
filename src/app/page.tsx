@@ -1,25 +1,30 @@
-// app/page.tsx
+"use client"
 import { useEffect, useState } from 'react';
 
 export default function HomePage() {
   const [workerData, setWorkerData] = useState<string | null>(null);
   const [pagesFunctionData, setPagesFunctionData] = useState<string | null>(null);
 
-  // Replace with your published Cloudflare Worker URL
-  const WORKER_API_URL = "https://my-worker.nrjrpl007-cloudflare.workers.dev/";
+  // Replace this with your published Cloudflare Worker URL
+  const WORKER_API_URL = 'https://my-worker.nrjrpl007-cloudflare.workers.dev/';
 
   useEffect(() => {
-    // Call the external Cloudflare Worker API
+    // Fetch from Cloudflare Worker API
     fetch(WORKER_API_URL)
       .then((res) => res.json())
       .then((data) => setWorkerData(data.message))
-      .catch((err) => console.error(err));
+      .catch((err) => console.error('Worker API error:', err));
 
-    // Call the Next.js API (Pages Function)
+    // Fetch from Next.js API (Pages Function)
     fetch('/api/data')
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+      })
       .then((data) => setPagesFunctionData(data.message))
-      .catch((err) => console.error(err));
+      .catch((err) => console.error('Pages Function error:', err));
   }, []);
 
   return (
